@@ -40,7 +40,7 @@ function syncdb {
 
 # Export
 printf "\n${_em}Exporting the ${_gr}${_source}${_me} database\n"
-wp db export --ssh=${_source} ${_remote_path}/syncdb.sql --add-drop-table
+wp db export --ssh=${_source} ${_remote_path}/syncdb.sql --add-drop-table --exec="error_reporting(0); @ini_set('display_errors', 0);"
 
 # Download
 printf "\n${_em}Downloading ${_gr}${_source}${_me} db to local ${_gr}${_local_path}/syncdb.sql\n${_me}"
@@ -54,11 +54,11 @@ fi
 
 # fetch URLs
 printf "${_em}\nGettimg urls from ${_gr}${_source}${_me} and ${_gr}${_destination}${_em}\n${_me}"
-_search_url=$( wp option get home --skip-themes --skip-plugins --ssh=${_source} )
+_search_url=$( wp option get home --skip-themes --skip-plugins --exec="error_reporting(0); @ini_set('display_errors', 0);" --ssh=${_source} )
 if [ ${_destination} = "local" ]; then
-  _replace_url=$( lando wp option get home --skip-themes --skip-plugins )
+  _replace_url=$( lando wp option get home --skip-themes --skip-plugins --exec="error_reporting(0); @ini_set('display_errors', 0);" )
 else
-  _replace_url=$( wp option get home --skip-themes --skip-plugins --ssh=${_destination} )
+  _replace_url=$( wp option get home --skip-themes --skip-plugins --exec="error_reporting(0); @ini_set('display_errors', 0);" --ssh=${_destination} )
 fi
 _search_url=$( echo ${_search_url} | tr -cd "[:print:]\n" ) # sanitize url
 _replace_url=$( echo ${_replace_url} | tr -cd "[:print:]\n" )
@@ -68,24 +68,24 @@ printf "${_em}\nImporting ${_gr}${_source}${_me} db at ${_gr}${_destination}${_e
 if [ ${_destination} = "local" ]; then
   lando db-import ${_local_path}/syncdb.sql
 else
-  wp db import ${_remote_path}/syncdb.sql --ssh=${_destination}
+  wp db import ${_remote_path}/syncdb.sql --exec="error_reporting(0); @ini_set('display_errors', 0);" --ssh=${_destination}
 fi
 
 # search-replace
 printf "\n${_em}Searching for ${_gr}${_search_url}${_me} and replacing with ${_gr}${_replace_url}\n${_me}"
 if [ ${_destination} = "local" ]; then
-  lando wp search-replace "${_search_url}" "${_replace_url}" --skip-columns=guid
+  lando wp search-replace "${_search_url}" "${_replace_url}" --skip-columns=guid --exec="error_reporting(0); @ini_set('display_errors', 0);"
 else
-  wp search-replace "${_search_url}" "${_replace_url}" --skip-columns=guid --ssh=${_destination}
+  wp search-replace "${_search_url}" "${_replace_url}" --skip-columns=guid --exec="error_reporting(0); @ini_set('display_errors', 0);"  --ssh=${_destination}
 fi
 
 # clean up
 printf "\n${_em}Cleaning up${_me}\n"
 _pre="" ; _post=""
 if [ ${_destination} = "local" ]; then
-	_pre="lando"
+  _pre="lando"
 else
-	_post="--ssh=${_destination}"
+  _post="--ssh=${_destination}"
 fi
 ${_pre} wp plugin activate --all ${_post}
 ${_pre} wp cache flush ${_post}
