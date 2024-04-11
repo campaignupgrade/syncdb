@@ -90,6 +90,7 @@ fi
 ${_pre} wp plugin activate --all ${_post}
 ${_pre} wp cache flush ${_post}
 ${_pre} wp rewrite flush ${_post}
+${_pre} wp spinupwp cache purge-site ${_post}
 ${_pre} wp acorn view:clear ${_post}
 ${_pre} wp acorn view:cache ${_post}
 if [ ${_destination} = "local" ]; then
