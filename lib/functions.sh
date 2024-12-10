@@ -66,7 +66,7 @@ _replace_url=$( echo ${_replace_url} | tr -cd "[:print:]\n" )
 # import
 printf "${_em}\nImporting ${_gr}${_source}${_me} db at ${_gr}${_destination}${_em}\n${_me}"
 if [ ${_destination} = "local" ]; then
-  lando db-import ${_local_path}/syncdb.sql
+  lando wp db import ${_local_path}/syncdb.sql
 else
   wp db import ${_remote_path}/syncdb.sql --exec="error_reporting(0); @ini_set('display_errors', 0);" --ssh=${_destination}
 fi
