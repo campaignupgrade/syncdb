@@ -1,7 +1,22 @@
 #!/bin/bash
 
 # define our variables
-source "${0%/*}"/options.sh
+# Check parent repo config first (version-controlled), fallback to local config (backward compat)
+if [[ -f "${0%/*}/../config/syncdb.sh" ]]; then
+    source "${0%/*}/../config/syncdb.sh"
+elif [[ -f "${0%/*}/options.sh" ]]; then
+    source "${0%/*}/options.sh"
+else
+    echo "ERROR: Syncdb configuration not found"
+    echo "Expected configuration at one of:"
+    echo "  ${0%/*}/../config/syncdb.sh (recommended, version-controlled)"
+    echo "  ${0%/*}/options.sh (legacy, local copy)"
+    echo ""
+    echo "For legacy setup, copy options.sh.example to options.sh:"
+    echo "  cp ${0%/*}/options.sh.example ${0%/*}/options.sh"
+    echo "  # Then edit options.sh with your project settings"
+    exit 1
+fi
 source "${0%/*}"/lib/functions.sh
 
 # Define the array of choices
