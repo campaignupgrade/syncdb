@@ -90,9 +90,19 @@ fi
 ${_pre} wp plugin activate --all ${_post}
 ${_pre} wp cache flush ${_post}
 ${_pre} wp rewrite flush ${_post}
-${_pre} wp spinupwp cache purge-site ${_post}
-${_pre} wp acorn view:clear ${_post}
-${_pre} wp acorn view:cache ${_post}
+
+# Check if SpinupWP is available before running cache purge
+if ${_pre} wp cli has-command "spinupwp cache purge-site" ${_post} 2>/dev/null; then
+  printf "${_em}Purging SpinupWP cache${_me}\n"
+  ${_pre} wp spinupwp cache purge-site ${_post}
+fi
+
+# Check if Acorn (Sage/Bedrock) is available before running view commands
+if ${_pre} wp cli has-command "acorn view:clear" ${_post} 2>/dev/null; then
+  printf "${_em}Clearing Acorn views${_me}\n"
+  ${_pre} wp acorn view:clear ${_post}
+  ${_pre} wp acorn view:cache ${_post}
+fi
 if [ ${_destination} = "local" ]; then
   rm ${_local_path}/syncdb.sql
 else
