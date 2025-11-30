@@ -15,17 +15,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for vanilla WordPress installations
 - Compatibility with Flywheel hosting
 - CHANGELOG.md to track version history
+- Bash strict mode (`set -euo pipefail`) for better error handling
+- Input validation functions (`validate_url`, `validate_remote`, `validate_path`)
+- Optional `_local_url` config variable for manual URL override
+- Auto-detection of local URL from `.lando.yml` when database doesn't exist
 
 ### Changed
 - Improved SpinupWP cache purge - now conditionally checks if command exists
 - Improved Acorn view commands - now conditionally checks if command exists
 - Replaced old readme with comprehensive README.md
 - Enhanced error handling to prevent failures on non-Bedrock projects
+- All variables now properly quoted throughout to prevent command injection
+- Destination URL now retrieved before import to avoid incorrect values
+- Non-critical cleanup operations now use `|| true` for graceful failures
+- Directory existence checks added before all operations
 
 ### Fixed
 - Script no longer fails when SpinupWP plugin is not available
 - Script no longer fails when Acorn (Bedrock/Sage) is not available
 - Framework-specific commands now gracefully skip when not available
+- Fixed path validation regex to properly detect directory traversal attempts
+- Added file existence checks before deletion to prevent errors
+
+### Security
+- All variables properly quoted to prevent command injection vulnerabilities
+- Removed `StrictHostKeyChecking=no` from SSH/rsync commands
+- Added URL validation to block shell injection characters
+- Added remote validation to whitelist allowed SSH hosts
+- Added path validation to prevent directory traversal attacks
 
 ## [0.3.0] - 2025-11-26
 
