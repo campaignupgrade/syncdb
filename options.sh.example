@@ -13,6 +13,11 @@ _local_path="dev/db"
 _remote_path="db"
 
 
+# local development URL (optional - will auto-detect from Lando if not set)
+# Uncomment and set if you want to override auto-detection
+# _local_url="https://mysite.lndo.site"
+
+
 # utility variables
 
 _em="\033[1m\033[37m"
