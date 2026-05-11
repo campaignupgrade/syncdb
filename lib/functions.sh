@@ -124,6 +124,22 @@ if ! rsync -avz -e "ssh" "${_source}:${_remote_path}/syncdb.sql" "${_local_path}
   return 1
 fi
 
+# Strip SET statements that require SUPER/SYSTEM_VARIABLES_ADMIN privileges,
+# which managed MySQL hosts (Flywheel, Lando) don't grant to application users.
+# Intended for non-replicating app environments only.
+printf "\n${_em}Stripping SUPER-privilege SET statements from dump\n${_me}"
+if ! sed '/^SET @@SESSION\.SQL_LOG_BIN/d; /^SET @@GLOBAL\.GTID_PURGED/d' \
+    "${_local_path}/syncdb.sql" > "${_local_path}/syncdb.sql.tmp"; then
+  printf "\n${_em}${_gr}ERROR:${_me} Failed to strip SET statements from dump\n"
+  rm -f "${_local_path}/syncdb.sql.tmp"
+  return 1
+fi
+if ! mv "${_local_path}/syncdb.sql.tmp" "${_local_path}/syncdb.sql"; then
+  printf "\n${_em}${_gr}ERROR:${_me} Failed to replace dump with stripped version\n"
+  rm -f "${_local_path}/syncdb.sql.tmp"
+  return 1
+fi
+
 # Upload
 if [ "${_destination}" != "local" ]; then
   printf "${_em}\nUploading ${_gr}${_source}${_me} db to ${_gr}${_destination}\n${_me}"
