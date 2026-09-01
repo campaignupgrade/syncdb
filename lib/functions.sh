@@ -127,8 +127,10 @@ fi
 # Strip SET statements that require SUPER/SYSTEM_VARIABLES_ADMIN privileges,
 # which managed MySQL hosts (Flywheel, Lando) don't grant to application users.
 # Intended for non-replicating app environments only.
+# LC_ALL=C: dumps can contain non-UTF-8 bytes (binary/serialized blobs); without it BSD sed on
+# macOS aborts with "RE error: illegal byte sequence".
 printf "\n${_em}Stripping SUPER-privilege SET statements from dump\n${_me}"
-if ! sed '/^SET @@SESSION\.SQL_LOG_BIN/d; /^SET @@GLOBAL\.GTID_PURGED/d' \
+if ! LC_ALL=C sed '/^SET @@SESSION\.SQL_LOG_BIN/d; /^SET @@GLOBAL\.GTID_PURGED/d' \
     "${_local_path}/syncdb.sql" > "${_local_path}/syncdb.sql.tmp"; then
   printf "\n${_em}${_gr}ERROR:${_me} Failed to strip SET statements from dump\n"
   rm -f "${_local_path}/syncdb.sql.tmp"
